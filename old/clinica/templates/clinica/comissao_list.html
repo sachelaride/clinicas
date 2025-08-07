@@ -1,0 +1,56 @@
+{% extends 'clinica/base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title"><i class="fa-solid fa-hand-holding-dollar"></i> Comissões</h2>
+        <div class="d-flex justify-content-between mb-3">
+            <a href="{% url 'clinica:comissao_create' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Nova Comissão</a>
+            <form method="get" class="d-flex">
+                <input type="text" name="search" class="form-control me-2" placeholder="Buscar..." value="{{ request.GET.search }}">
+                <button type="submit" class="btn btn-outline-secondary"><i class="fa-solid fa-search"></i></button>
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th><a href="?order_by=profissional__user__username{% if order_by == 'profissional__user__username' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Profissional</a></th>
+                        <th><a href="?order_by=atendimento__agendamento__paciente__nome{% if order_by == 'atendimento__agendamento__paciente__nome' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Paciente</a></th>
+                        <th><a href="?order_by=valor{% if order_by == 'valor' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Valor</a></th>
+                        <th><a href="?order_by=paga{% if order_by == 'paga' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Paga</a></th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for comissao in comissoes %}
+                        <tr>
+                            <td>{{ comissao.profissional.user.username }}</td>
+                            <td>{{ comissao.atendimento.agendamento.paciente.nome }}</td>
+                            <td>R$ {{ comissao.valor|floatformat:2 }}</td>
+                            <td>
+                                {% if comissao.paga %}
+                                    <i class="fa-solid fa-check-circle text-success"></i> Sim
+                                {% else %}
+                                    <i class="fa-solid fa-times-circle text-danger"></i> Não
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'clinica:comissao_update' comissao.pk %}" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-pen"></i></a>
+                                <a href="{% url 'clinica:comissao_delete' comissao.pk %}" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">Nenhuma comissão encontrada.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% include 'includes/pagination.html' %}
+    </div>
+</div>
+{% endblock %}

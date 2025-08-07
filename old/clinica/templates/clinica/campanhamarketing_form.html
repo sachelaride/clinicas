@@ -1,0 +1,63 @@
+{% extends 'clinica/base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title">
+            {% if edit_mode %}
+                <i class="fa-solid fa-bullhorn"></i> Editar Campanha de Marketing
+            {% else %}
+                <i class="fa-solid fa-bullhorn"></i> Nova Campanha de Marketing
+            {% endif %}
+        </h2>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.nome.label_tag }}
+                    {{ form.nome }}
+                    {% if form.nome.errors %}
+                        <div class="invalid-feedback d-block">{{ form.nome.errors|first }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.tipo.label_tag }}
+                    {{ form.tipo }}
+                    {% if form.tipo.errors %}
+                        <div class="invalid-feedback d-block">{{ form.tipo.errors|first }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.data_inicio.label_tag }}
+                    {{ form.data_inicio }}
+                    {% if form.data_inicio.errors %}
+                        <div class="invalid-feedback d-block">{{ form.data_inicio.errors|first }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    {{ form.data_fim.label_tag }}
+                    {{ form.data_fim }}
+                    {% if form.data_fim.errors %}
+                        <div class="invalid-feedback d-block">{{ form.data_fim.errors|first }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-12 mb-3">
+                    {{ form.descricao.label_tag }}
+                    {{ form.descricao }}
+                    {% if form.descricao.errors %}
+                        <div class="invalid-feedback d-block">{{ form.descricao.errors|first }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-end gap-2">
+                <a href="{% url 'clinica:campanhamarketing_list' %}" class="btn btn-secondary"><i class="fa-solid fa-xmark"></i> Cancelar</a>
+                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

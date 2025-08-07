@@ -1,0 +1,157 @@
+{% extends 'clinica/base.html' %}
+
+{% block title %}Calendário de Agendamentos{% endblock %}
+
+{% block extra_head %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+<style>
+    #calendar {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: var(--cor-superficie);
+        border-radius: var(--borda-radius);
+        box-shadow: var(--sombra-padrao);
+    }
+    .fc-event {
+        cursor: pointer;
+        border-radius: var(--borda-radius);
+        font-weight: 500;
+    }
+    .fc-event-title {
+        font-weight: bold;
+    }
+    .modal-body {
+        padding: 20px;
+    }
+    .agendamento-info {
+        margin-bottom: 10px;
+        font-size: 1rem;
+    }
+    .agendamento-info strong {
+        display: inline-block;
+        width: 120px;
+        color: var(--cor-texto-principal);
+    }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+    .legend-color-box {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+        border: 1px solid #ccc;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title"><i class="fa-solid fa-calendar-alt"></i> Calendário de Agendamentos</h2>
+                    <div class="mb-3 d-flex gap-2">
+                        <a href="{% url 'clinica:agendamento_create' %}" class="btn btn-success"><i class="fa-solid fa-plus"></i> Novo Agendamento</a>
+                        <a href="{% url 'clinica:agendamento_list' %}" class="btn btn-secondary"><i class="fa-solid fa-list"></i> Lista de Agendamentos</a>
+                    </div>
+                    <div id='calendar'></div>
+
+                    <h4 class="mt-4">Legenda por Aluno:</h4>
+                    <div class="legend-container">
+                        {% for aluno_username, color in aluno_colors.items %}
+                            <div class="legend-item">
+                                <div class="legend-color-box" style="background-color: {{ color }};"></div>
+                                <span>{{ aluno_username }}</span>
+                            </div>
+                        {% endfor %}
+                        <div class="legend-item">
+                            <div class="legend-color-box" style="background-color: #A9A9A9;"></div>
+                            <span>Sem Aluno (Padrão)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="agendamentoModal" tabindex="-1" aria-labelledby="agendamentoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="agendamentoModalLabel">Detalhes do Agendamento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="agendamentoModalBody">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        buttonText: {
+            today: 'Hoje',
+            month: 'Mês',
+            week: 'Semana',
+            day: 'Dia'
+        },
+        height: 'auto',
+        slotMinTime: '06:00:00',
+        slotMaxTime: '21:00:00',
+        events: '{% url "clinica:agendamento_api" %}',
+        eventClick: function(info) {
+            var event = info.event;
+            var modalBody = document.getElementById('agendamentoModalBody');
+            
+            modalBody.innerHTML = `
+                <div class="agendamento-info">
+                    <strong>Paciente:</strong> ${event.extendedProps.paciente}
+                </div>
+                <div class="agendamento-info">
+                    <strong>Médico:</strong> ${event.extendedProps.medico}
+                </div>
+                <div class="agendamento-info">
+                    <strong>Aluno:</strong> ${event.extendedProps.aluno || 'N/A'}
+                </div>
+                <div class="agendamento-info">
+                    <strong>Guichê:</strong> ${event.extendedProps.guiche_numero || 'N/A'}
+                </div>
+                <div class="agendamento-info">
+                    <strong>Data/Hora:</strong> ${event.start.toLocaleString('pt-BR')}
+                </div>
+                <div class="agendamento-info">
+                    <strong>Status:</strong> ${event.extendedProps.status}
+                </div>
+            `;
+            
+            var modal = new bootstrap.Modal(document.getElementById('agendamentoModal'));
+            modal.show();
+        },
+        eventDidMount: function(info) {
+            // As cores já vêm do backend via backgroundColor e borderColor
+            // Não precisamos mais das classes fc-event-agendado, etc.
+        }
+    });
+    
+    calendar.render();
+});
+</script>
+{% endblock %}

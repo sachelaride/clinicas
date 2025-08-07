@@ -1,0 +1,17 @@
+{% extends 'clinica/base.html' %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-body">
+      <h2 class="card-title">Confirmar Exclusão</h2>
+      <p>Você tem certeza que deseja excluir o prontuário do paciente <strong>{{ prontuario.paciente.nome }}</strong>?</p>
+      <p class="text-muted">Esta ação não pode ser desfeita.</p>
+      
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Sim, tenho certeza. Excluir.</button>
+        <a href="{% url 'clinica:prontuario_list' %}" class="btn btn-secondary">Cancelar</a>
+      </form>
+    </div>
+  </div>
+{% endblock %}

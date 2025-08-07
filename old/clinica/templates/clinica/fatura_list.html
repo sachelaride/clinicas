@@ -1,0 +1,50 @@
+{% extends 'clinica/base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title"><i class="fa-solid fa-file-invoice"></i> Faturas</h2>
+        <div class="d-flex justify-content-between mb-3">
+            <a href="{% url 'clinica:fatura_create' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Nova Fatura</a>
+            <form method="get" class="d-flex">
+                <input type="text" name="search" class="form-control me-2" placeholder="Buscar..." value="{{ request.GET.search }}">
+                <button type="submit" class="btn btn-outline-secondary"><i class="fa-solid fa-search"></i></button>
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th><a href="?order_by=convenio__nome{% if order_by == 'convenio__nome' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Convênio</a></th>
+                        <th><a href="?order_by=mes_referencia{% if order_by == 'mes_referencia' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Mês Referência</a></th>
+                        <th><a href="?order_by=valor_total{% if order_by == 'valor_total' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Valor Total</a></th>
+                        <th><a href="?order_by=status{% if order_by == 'status' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Status</a></th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fatura in faturas %}
+                        <tr>
+                            <td>{{ fatura.convenio.nome }}</td>
+                            <td>{{ fatura.mes_referencia|date:"m/Y" }}</td>
+                            <td>R$ {{ fatura.valor_total|floatformat:2 }}</td>
+                            <td>{{ fatura.get_status_display }}</td>
+                            <td>
+                                <a href="{% url 'clinica:fatura_update' fatura.pk %}" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-pen"></i></a>
+                                <a href="{% url 'clinica:fatura_delete' fatura.pk %}" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">Nenhuma fatura encontrada.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% include 'includes/pagination.html' %}
+    </div>
+</div>
+{% endblock %}

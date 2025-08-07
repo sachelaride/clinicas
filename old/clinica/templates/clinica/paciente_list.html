@@ -1,0 +1,89 @@
+
+
+{% extends 'clinica/base.html' %} {# Estende o template base para herdar a estrutura e estilos #}
+
+{% block content %} {# Início do bloco de conteúdo principal da página #}
+    {# Título da página #}
+    <h2>Lista de Pacientes</h2>
+
+    {# Formulário de busca e botões de ação #}
+    <form method="get" class="mb-3 d-flex gap-2 align-items-center"> {# Formulário GET para busca, com layout flexível #}
+        {# Campo de input para o termo de busca #}
+        <input type="text" name="search" class="form-control" placeholder="Buscar por nome, CPF ou telefone" value="{{ request.GET.search|default_if_none:'' }}"> {# O valor é preenchido com o termo de busca atual, se houver #}
+        {# Botão para submeter a busca #}
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+        {# Botão para limpar os filtros de busca e ordenação #}
+        <a href="{% url 'clinica:paciente_list' %}" class="btn btn-info"><i class="fa-solid fa-arrows-rotate"></i> Limpar</a>
+    </form>
+
+    {# Botão para criar um novo paciente #}
+    <a href="{% url 'clinica:paciente_create' %}" class="btn btn-success mb-3"><i class="fa-solid fa-plus"></i> Novo Paciente</a>
+
+    {# Tabela para exibir a lista de pacientes #}
+    <table class="table table-striped"> {# Tabela com linhas zebradas para melhor legibilidade #}
+        <thead> {# Cabeçalho da tabela #}
+            <tr>
+                {# Colunas ordenáveis: ao clicar, a lista é reordenada por este campo #}
+                <th><a href="?page={{ pacientes.number }}&search={{ request.GET.search|default_if_none:'' }}&order_by={% if order_by == 'nome' %}-nome{% else %}nome{% endif %}">Nome {% if order_by == 'nome' %}<i class="fa-solid fa-arrow-up"></i>{% elif order_by == '-nome' %}<i class="fa-solid fa-arrow-down"></i>{% endif %}</a></th>
+                <th><a href="?page={{ pacientes.number }}&search={{ request.GET.search|default_if_none:'' }}&order_by={% if order_by == 'cpf' %}-cpf{% else %}cpf{% endif %}">CPF {% if order_by == 'cpf' %}<i class="fa-solid fa-arrow-up"></i>{% elif order_by == '-cpf' %}<i class="fa-solid fa-arrow-down"></i>{% endif %}</a></th>
+                <th>Email</th> {# Coluna não ordenável #}
+                <th>Telefone</th> {# Coluna não ordenável #}
+                <th>Responsável Legal</th> {# Coluna não ordenável #}
+                <th>Prontuários</th>
+                <th>Documentos</th>
+                <th>Ações</th> {# Coluna para botões de ação #}
+            </tr>
+        </thead>
+        <tbody> {# Corpo da tabela #}
+            {% for paciente in pacientes %} {# Itera sobre cada paciente na página atual #}
+                <tr>
+                    <td>{{ paciente.nome }}</td>
+                    <td>{{ paciente.cpf }}</td>
+                    <td>{{ paciente.email|default:"N/A" }}</td> {# Exibe o email ou "N/A" se não houver #}
+                    <td>{{ paciente.telefone }}</td>
+                    <td>{{ paciente.responsavel_legal|default:"N/A" }}</td> {# Exibe o responsável legal ou "N/A" se não houver #}
+                    <td><a href="{% url 'clinica:prontuario_list' %}?search={{ paciente.nome }}">Ver</a></td>
+                    <td><a href="{% url 'clinica:documento_list' %}?search={{ paciente.nome }}">Ver</a></td>
+                    <td>
+                        {# Botão para editar o paciente #}
+                        <a href="{% url 'clinica:paciente_update' paciente.pk %}" class="btn btn-sm btn-secondary"><i class="fa-solid fa-pencil"></i> Editar</a>
+                        {# Botão para excluir o paciente, com ícone e confirmação via JavaScript #}
+                        <a href="{% url 'clinica:paciente_delete' paciente.pk %}" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza que deseja excluir este paciente?');"><i class="fa-solid fa-trash"></i> Excluir</a>
+                    </td>
+                </tr>
+            {% empty %} {# Exibido se não houver pacientes #}
+                <tr>
+                    <td colspan="6">Nenhum paciente cadastrado.</td> {# Mensagem de tabela vazia #}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {# Navegação de Paginação #}
+    <nav aria-label="Page navigation"> {# Componente de navegação para paginação #}
+        <ul class="pagination justify-content-center"> {# Lista de itens de paginação centralizada #}
+            {# Link para a página anterior #}
+            {% if pacientes.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ pacientes.previous_page_number }}&search={{ request.GET.search|default_if_none:'' }}&order_by={{ order_by }}">Anterior</a></li>
+            {% else %}
+                <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li> {# Desabilitado se não houver página anterior #}
+            {% endif %}
+
+            {# Links para cada página #}
+            {% for i in pacientes.paginator.page_range %}
+                {% if pacientes.number == i %}
+                    <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li> {# Página atual destacada #}
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{ i }}&search={{ request.GET.search|default_if_none:'' }}&order_by={{ order_by }}">{{ i }}</a></li> {# Link para outras páginas #}
+                {% endif %}
+            {% endfor %}
+
+            {# Link para a próxima página #}
+            {% if pacientes.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ pacientes.next_page_number }}&search={{ request.GET.search|default_if_none:'' }}&order_by={{ order_by }}">Próximo</a></li>
+            {% else %}
+                <li class="page-item disabled"><a class="page-link" href="#">Próximo</a></li> {# Desabilitado se não houver próxima página #}
+            {% endif %}
+        </ul>
+    </nav>
+{% endblock %} {# Fim do bloco de conteúdo #}

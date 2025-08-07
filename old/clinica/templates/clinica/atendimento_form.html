@@ -1,0 +1,64 @@
+{% extends 'clinica/base.html' %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-body">
+      <h2 class="card-title">
+        {% if edit_mode %}
+          <i class="fa-solid fa-file-pen"></i> Editar Atendimento
+        {% else %}
+          <i class="fa-solid fa-file-circle-plus"></i> Novo Atendimento
+        {% endif %}
+      </h2>
+
+      <form method="post">
+        {% csrf_token %}
+        
+        <div class="row">
+          {% for field in form %}
+            <div class="col-md-6 mb-3">
+              {{ field.label_tag }}
+              {{ field }}
+              {% if field.errors %}
+                <div class="invalid-feedback d-block">
+                  {{ field.errors|first }}
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+
+        <hr>
+
+        <div class="d-flex justify-content-end gap-2">
+          <a href="{% url 'clinica:atendimento_list' %}" class="btn btn-secondary"><i class="fa-solid fa-xmark"></i> Cancelar</a>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Salvar</button>
+          {% if edit_mode and atendimento.prontuario %}
+            <a href="{% url 'clinica:prontuario_update' atendimento.prontuario.pk %}" class="btn btn-info"><i class="fa-solid fa-file-medical"></i> Ver Prontuário</a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_body %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    flatpickr("#id_data_inicio", {
+      enableTime: true,
+      dateFormat: "Y-m-d H:i",
+      locale: "pt",
+      minTime: "06:00",
+      maxTime: "21:00",
+    });
+
+    flatpickr("#id_data_fim", {
+      enableTime: true,
+      dateFormat: "Y-m-d H:i",
+      locale: "pt",
+      minTime: "06:00",
+      maxTime: "21:00",
+    });
+</script>
+{% endblock %}

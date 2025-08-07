@@ -1,0 +1,52 @@
+{% extends 'clinica/base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title"><i class="fa-solid fa-dollar-sign"></i> Lançamentos Financeiros</h2>
+        <div class="d-flex justify-content-between mb-3">
+            <a href="{% url 'clinica:lancamentofinanceiro_create' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Novo Lançamento</a>
+            <form method="get" class="d-flex">
+                <input type="text" name="search" class="form-control me-2" placeholder="Buscar..." value="{{ request.GET.search }}">
+                <button type="submit" class="btn btn-outline-secondary"><i class="fa-solid fa-search"></i></button>
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th><a href="?order_by=tipo{% if order_by == 'tipo' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Tipo</a></th>
+                        <th><a href="?order_by=descricao{% if order_by == 'descricao' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Descrição</a></th>
+                        <th><a href="?order_by=valor{% if order_by == 'valor' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Valor</a></th>
+                        <th><a href="?order_by=data_vencimento{% if order_by == 'data_vencimento' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Vencimento</a></th>
+                        <th><a href="?order_by=data_pagamento{% if order_by == 'data_pagamento' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Pagamento</a></th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for lancamento in lancamentos %}
+                        <tr>
+                            <td>{{ lancamento.get_tipo_display }}</td>
+                            <td>{{ lancamento.descricao }}</td>
+                            <td>R$ {{ lancamento.valor|floatformat:2 }}</td>
+                            <td>{{ lancamento.data_vencimento|date:"d/m/Y" }}</td>
+                            <td>{{ lancamento.data_pagamento|date:"d/m/Y"|default:"---" }}</td>
+                            <td>
+                                <a href="{% url 'clinica:lancamentofinanceiro_update' lancamento.pk %}" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-pen"></i></a>
+                                <a href="{% url 'clinica:lancamentofinanceiro_delete' lancamento.pk %}" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">Nenhum lançamento financeiro encontrado.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% include 'includes/pagination.html' %}
+    </div>
+</div>
+{% endblock %}

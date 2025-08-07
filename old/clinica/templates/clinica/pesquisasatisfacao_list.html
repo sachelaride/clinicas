@@ -1,0 +1,50 @@
+{% extends 'clinica/base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title"><i class="fa-solid fa-star"></i> Pesquisas de Satisfação</h2>
+        <div class="d-flex justify-content-between mb-3">
+            <a href="{% url 'clinica:pesquisasatisfacao_create' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Nova Pesquisa</a>
+            <form method="get" class="d-flex">
+                <input type="text" name="search" class="form-control me-2" placeholder="Buscar..." value="{{ request.GET.search }}">
+                <button type="submit" class="btn btn-outline-secondary"><i class="fa-solid fa-search"></i></button>
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th><a href="?order_by=paciente__nome{% if order_by == 'paciente__nome' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Paciente</a></th>
+                        <th><a href="?order_by=data_pesquisa{% if order_by == 'data_pesquisa' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Data da Pesquisa</a></th>
+                        <th><a href="?order_by=nota_nps{% if order_by == 'nota_nps' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Nota NPS</a></th>
+                        <th>Comentários</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pesquisa in pesquisas %}
+                        <tr>
+                            <td>{{ pesquisa.paciente.nome }}</td>
+                            <td>{{ pesquisa.data_pesquisa|date:"d/m/Y" }}</td>
+                            <td>{{ pesquisa.nota_nps }}</td>
+                            <td>{{ pesquisa.comentarios|default:"---" }}</td>
+                            <td>
+                                <a href="{% url 'clinica:pesquisasatisfacao_update' pesquisa.pk %}" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-pen"></i></a>
+                                <a href="{% url 'clinica:pesquisasatisfacao_delete' pesquisa.pk %}" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">Nenhuma pesquisa de satisfação encontrada.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% include 'includes/pagination.html' %}
+    </div>
+</div>
+{% endblock %}

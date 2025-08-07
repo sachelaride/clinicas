@@ -1,0 +1,58 @@
+{% extends 'clinica/base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h2 class="card-title"><i class="fa-solid fa-ticket"></i> Cupons de Desconto</h2>
+        <div class="d-flex justify-content-between mb-3">
+            <a href="{% url 'clinica:cupomdesconto_create' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Novo Cupom</a>
+            <form method="get" class="d-flex">
+                <input type="text" name="search" class="form-control me-2" placeholder="Buscar..." value="{{ request.GET.search }}">
+                <button type="submit" class="btn btn-outline-secondary"><i class="fa-solid fa-search"></i></button>
+            </form>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th><a href="?order_by=codigo{% if order_by == 'codigo' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Código</a></th>
+                        <th><a href="?order_by=valor_desconto{% if order_by == 'valor_desconto' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Valor Desconto</a></th>
+                        <th><a href="?order_by=data_validade{% if order_by == 'data_validade' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Data Validade</a></th>
+                        <th><a href="?order_by=ativo{% if order_by == 'ativo' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Ativo</a></th>
+                        <th><a href="?order_by=campanha__nome{% if order_by == 'campanha__nome' and not request.GET.order_direction == 'desc' %}&order_direction=desc{% endif %}">Campanha</a></th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cupom in cupons %}
+                        <tr>
+                            <td>{{ cupom.codigo }}</td>
+                            <td>R$ {{ cupom.valor_desconto|floatformat:2 }}</td>
+                            <td>{{ cupom.data_validade|date:"d/m/Y" }}</td>
+                            <td>
+                                {% if cupom.ativo %}
+                                    <i class="fa-solid fa-check-circle text-success"></i> Sim
+                                {% else %}
+                                    <i class="fa-solid fa-times-circle text-danger"></i> Não
+                                {% endif %}
+                            </td>
+                            <td>{{ cupom.campanha.nome|default:"---" }}</td>
+                            <td>
+                                <a href="{% url 'clinica:cupomdesconto_update' cupom.pk %}" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-pen"></i></a>
+                                <a href="{% url 'clinica:cupomdesconto_delete' cupom.pk %}" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">Nenhum cupom de desconto encontrado.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% include 'includes/pagination.html' %}
+    </div>
+</div>
+{% endblock %}

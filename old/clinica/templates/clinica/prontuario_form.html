@@ -1,0 +1,219 @@
+{% extends 'clinica/base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title mb-0">
+            <i class="fa-solid fa-file-medical"></i> Prontuário de {{ paciente.nome }}
+        </h2>
+    </div>
+    <div class="card-body">
+        <ul class="nav nav-tabs" id="prontuarioTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="paciente-info-tab" data-bs-toggle="tab" data-bs-target="#paciente-info" type="button" role="tab" aria-controls="paciente-info" aria-selected="true">
+                    1. Dados do Paciente e Prontuários
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="historico-clinico-tab" data-bs-toggle="tab" data-bs-target="#historico-clinico" type="button" role="tab" aria-controls="historico-clinico" aria-selected="false">
+                    2. Histórico Clínico
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="exame-fisico-tab" data-bs-toggle="tab" data-bs-target="#exame-fisico" type="button" role="tab" aria-controls="exame-fisico" aria-selected="false">
+                    3. Exame Físico e Avaliações
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="diagnostico-tab" data-bs-toggle="tab" data-bs-target="#diagnostico" type="button" role="tab" aria-controls="diagnostico" aria-selected="false">
+                    4. Diagnóstico
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="conduta-tab" data-bs-toggle="tab" data-bs-target="#conduta" type="button" role="tab" aria-controls="conduta" aria-selected="false">
+                    5. Conduta e Plano Terapêutico
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="evolucao-tab" data-bs-toggle="tab" data-bs-target="#evolucao" type="button" role="tab" aria-controls="evolucao" aria-selected="false">
+                    6. Evolução Clínica
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="documentos-tab" data-bs-toggle="tab" data-bs-target="#documentos" type="button" role="tab" aria-controls="documentos" aria-selected="false">
+                    7. Termos e Documentos Anexos
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="assinaturas-tab" data-bs-toggle="tab" data-bs-target="#assinaturas" type="button" role="tab" aria-controls="assinaturas" aria-selected="false">
+                    8. Assinaturas e Finalização
+                </button>
+            </li>
+        </ul>
+
+        <form method="post" enctype="multipart/form-data" class="mt-3">
+            {% csrf_token %}
+            <input type="hidden" name="finalize" id="finalize_input" value="false">
+            <div class="tab-content" id="prontuarioTabContent">
+                <div class="tab-pane fade show active p-3" id="paciente-info" role="tabpanel" aria-labelledby="paciente-info-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Nome:</strong> {{ paciente.nome }}</p>
+                            <p><strong>CPF:</strong> {{ paciente.cpf }}</p>
+                            <p><strong>Data de Nascimento:</strong> {{ paciente.data_nascimento|date:"d/m/Y" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Telefone:</strong> {{ paciente.telefone }}</p>
+                            <p><strong>Email:</strong> {{ paciente.email }}</p>
+                            <p><strong>Responsável:</strong> {{ paciente.responsavel_legal|default:"N/A" }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <h4 class="mb-3">Histórico de Prontuários</h4>
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Tratamento Definido</th>
+                                <th>Queixa Principal</th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pront in paciente_prontuarios %}
+                            <tr class="align-middle">
+                                <td>{{ pront.data_criacao|date:"d/m/Y" }}</td>
+                                <td>{{ pront.tipo_tratamento_definido.nome|default:"N/A" }}</td>
+                                <td>{{ pront.queixa_principal|truncatechars:40 }}</td>
+                                <td class="text-center">
+                                    <a href="{% url 'clinica:prontuario_update' pront.pk %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fa-solid fa-eye"></i> Detalhes
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">Nenhum prontuário anterior encontrado.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% include 'includes/pagination.html' with page_obj=paciente_prontuarios %}
+                </div>
+
+                <div class="tab-pane fade p-3" id="historico-clinico" role="tabpanel" aria-labelledby="historico-clinico-tab">
+                    <div class="row">
+                        <div class="col-12 mb-3">{{ form.queixa_principal.label_tag }}{{ form.queixa_principal }}</div>
+                        <div class="col-12 mb-3">{{ form.historia_doenca_atual.label_tag }}{{ form.historia_doenca_atual }}</div>
+                        <div class="col-12 mb-3">{{ form.antecedentes_pessoais_familiares.label_tag }}{{ form.antecedentes_pessoais_familiares }}</div>
+                        <div class="col-12 mb-3">{{ form.habitos_vida.label_tag }}{{ form.habitos_vida }}</div>
+                        <div class="col-12 mb-3">{{ form.uso_medicamentos.label_tag }}{{ form.uso_medicamentos }}</div>
+                        <div class="col-12 mb-3">{{ form.alergias_conhecidas.label_tag }}{{ form.alergias_conhecidas }}</div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade p-3" id="exame-fisico" role="tabpanel" aria-labelledby="exame-fisico-tab">
+                    <div class="row">
+                        <div class="col-12 mb-3">{{ form.sinais_vitais.label_tag }}{{ form.sinais_vitais }}</div>
+                        <div class="col-12 mb-3">{{ form.exame_fisico_geral_segmentar.label_tag }}{{ form.exame_fisico_geral_segmentar }}</div>
+                        <div class="col-12 mb-3">{{ form.avaliacoes_especificas.label_tag }}{{ form.avaliacoes_especificas }}</div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade p-3" id="diagnostico" role="tabpanel" aria-labelledby="diagnostico-tab">
+                    <div class="row">
+                        <div class="col-12 mb-3">{{ form.hipoteses_diagnosticas.label_tag }}{{ form.hipoteses_diagnosticas }}</div>
+                        <div class="col-12 mb-3">{{ form.exames_complementares.label_tag }}{{ form.exames_complementares }}</div>
+                        <div class="col-12 mb-3">{{ form.conclusao_diagnostica.label_tag }}{{ form.conclusao_diagnostica }}</div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade p-3" id="conduta" role="tabpanel" aria-labelledby="conduta-tab">
+                    <div class="row">
+                        <div class="col-12 mb-3">{{ form.prescricoes.label_tag }}{{ form.prescricoes }}</div>
+                        <div class="col-12 mb-3">{{ form.encaminhamentos.label_tag }}{{ form.encaminhamentos }}</div>
+                        <div class="col-12 mb-3">{{ form.procedimentos_realizados.label_tag }}{{ form.procedimentos_realizados }}</div>
+                        <div class="col-12 mb-3">{{ form.orientacoes_paciente.label_tag }}{{ form.orientacoes_paciente }}</div>
+                        <div class="col-12 mb-3">{{ form.plano_tratamento_acompanhamento.label_tag }}{{ form.plano_tratamento_acompanhamento }}</div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade p-3" id="evolucao" role="tabpanel" aria-labelledby="evolucao-tab">
+                    <div class="row">
+                        <div class="col-12 mb-3">{{ form.evolucao_clinica.label_tag }}{{ form.evolucao_clinica }}</div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade p-3" id="documentos" role="tabpanel" aria-labelledby="documentos-tab">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">{{ form.termo_consentimento.label_tag }}{{ form.termo_consentimento }}</div>
+                        <div class="col-md-6 mb-3">{{ form.fichas_avaliacao_especifica.label_tag }}{{ form.fichas_avaliacao_especifica }}</div>
+                        <div class="col-md-6 mb-3">{{ form.exames_laboratoriais_imagem.label_tag }}{{ form.exames_laboratoriais_imagem }}</div>
+                        <div class="col-md-6 mb-3">{{ form.relatorios_outros_profissionais.label_tag }}{{ form.relatorios_outros_profissionais }}</div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade p-3" id="assinaturas" role="tabpanel" aria-labelledby="assinaturas-tab">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">{{ form.assinatura_profissional.label_tag }}{{ form.assinatura_profissional }}</div>
+                        <div class="col-md-6 mb-3">{{ form.registro_profissional.label_tag }}{{ form.registro_profissional }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer text-end">
+                <a href="{% url 'clinica:prontuario_list' %}" class="btn btn-secondary"><i class="fa-solid fa-xmark"></i> Cancelar</a>
+                <button type="submit" class="btn btn-primary" id="saveButton"><i class="fa-solid fa-save"></i> Salvar Alterações</button>
+                <button type="button" class="btn btn-danger" id="finalizeButton"><i class="fa-solid fa-lock"></i> Finalizar e Bloquear</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_body %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const fields = form.querySelectorAll('input, select, textarea');
+    const saveButton = document.getElementById('saveButton');
+    const finalizeButton = document.getElementById('finalizeButton');
+    const finalizeInput = document.getElementById('finalize_input');
+
+    const isEditable = !{{ form.instance.is_finalized|yesno:"true,false" }};
+    const userIsCoordinator = {{ request.user.is_coordinator|yesno:"true,false" }};
+
+    if (!isEditable && !userIsCoordinator) {
+        fields.forEach(field => {
+            field.setAttribute('disabled', 'disabled');
+        });
+        if (saveButton) saveButton.style.display = 'none';
+        if (finalizeButton) finalizeButton.style.display = 'none';
+    }
+
+    finalizeButton.addEventListener('click', function() {
+        if (confirm('Tem certeza que deseja finalizar este prontuário? Após a finalização, ele não poderá ser editado.')) {
+            finalizeInput.value = 'true';
+            form.submit();
+        }
+    });
+
+    // Adiciona classes do Bootstrap para estilização correta
+    fields.forEach(field => {
+        if (field.type === 'checkbox' || field.type === 'radio') {
+            if (!field.classList.contains('form-check-input')) {
+                 field.classList.add('form-check-input');
+            }
+        } else if (field.tagName === 'SELECT') {
+            if (!field.classList.contains('form-select')) {
+                 field.classList.add('form-select');
+            }
+        } else if (field.type !== 'hidden') {
+            if (!field.classList.contains('form-control')) {
+                 field.classList.add('form-control');
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
