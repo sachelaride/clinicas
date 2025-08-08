@@ -1,6 +1,6 @@
 # Sistema de Gestão de Clínicas
 
-Um sistema web completo para a gestão de clínicas médicas, odontológicas e de outras especialidades, desenvolvido com Django. O projeto visa centralizar e otimizar todas as operações da clínica, desde o agendamento de pacientes até a gestão financeira e de marketing.
+Um sistema web completo para a gestão de clínicas médicas, odontológicas e de outras especialidades, desenvolvido com FastAPI (Python) para o backend e React (JavaScript) para o frontend. O projeto visa centralizar e otimizar todas as operações da clínica, desde o agendamento de pacientes até a gestão financeira e de marketing.
 
 ## ✨ Funcionalidades Principais
 
@@ -51,12 +51,50 @@ O sistema é dividido em módulos que cobrem as principais áreas de uma clínic
 - **Portal do Profissional:** Uma área dedicada ao profissional da saúde para visualizar sua agenda, acessar os prontuários dos seus pacientes e registrar atendimentos.
 
 ## 🛠️ Tecnologias Utilizadas
-- **Backend:** Python 3, Django 4.2
+- **Backend:** Python 3, FastAPI
 - **Banco de Dados:** PostgreSQL
-- **Frontend:** HTML, CSS, JavaScript (com estrutura para componentes)
+- **Frontend:** React, JavaScript, HTML, CSS
 
 ## 🚀 Instalação
-Para instruções detalhadas de como instalar e configurar o ambiente de desenvolvimento, consulte o arquivo [install/install.md](install/install.md).
+Para instruções detalhadas de como instalar e configurar o ambiente de desenvolvimento, consulte o arquivo [install.md](install.md).
+
+## 🔄 Migrações de Banco de Dados (Alembic)
+
+Este projeto utiliza [Alembic](https://alembic.sqlalchemy.org/en/latest/) para gerenciar as migrações do banco de dados.
+
+### Como Gerar uma Nova Migração
+
+Após fazer alterações nos modelos SQLAlchemy (`app/models.py`), você pode gerar uma nova migração automaticamente:
+
+```bash
+alembic revision --autogenerate -m "Sua mensagem descritiva aqui"
+```
+
+Substitua `"Sua mensagem descritiva aqui"` por uma descrição clara das mudanças no esquema.
+
+### Como Aplicar Migrações
+
+Para aplicar todas as migrações pendentes ao seu banco de dados (levando-o ao estado mais recente), execute:
+
+```bash
+alembic upgrade head
+```
+
+### Como Reverter Migrações
+
+Para reverter a última migração aplicada:
+
+```bash
+alembic downgrade -1
+```
+
+Para reverter para uma revisão específica (substitua `[REVISAO]` pelo ID da revisão):
+
+```bash
+alembic downgrade [REVISAO]
+```
+
+Para informações sobre como integrar as migrações no processo de deploy, consulte [DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## 🗺️ Roadmap
-Temos muitas ideias para o futuro! Confira nosso [roadmap.md](install/roadmap.md) para ver as próximas funcionalidades e melhorias planejadas para o sistema.
+Temos muitas ideias para o futuro! Confira nosso [roadmap.md](roadmap.md) para ver as próximas funcionalidades e melhorias planejadas para o sistema.

@@ -6,3 +6,9 @@ psycopg2-binary
 pydantic
 passlib[bcrypt]
 python-jose[cryptography]
+
+# Dependências de Teste
+pytest
+pytest-cov
+httpx
+alembic

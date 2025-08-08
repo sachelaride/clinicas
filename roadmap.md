@@ -75,12 +75,12 @@ A seguir, são apresentadas sugestões de evolução para o sistema.
         - **Frontend E2E:** Adotar `Playwright` para testes end-to-end (e2e) de fluxos críticos (ex: login).
         - **Frontend Componentes:** Implementar testes de componentes críticos com `React Testing Library`.
         - **CI/CD:** Configurar pipelines para executar testes automaticamente em cada Pull Request.
-- [ ] **Migrações Alembic:**
-    - [ ] **Configurar Alembic:** Instalar e configurar o Alembic no projeto backend.
-    - [ ] **Gerar Primeira Migração:** Gerar a migração inicial do banco de dados a partir do modelo atual.
-    - [ ] **Testar Migração Localmente:** Testar a aplicação com as migrações do Alembic em um ambiente de desenvolvimento local.
-    - [ ] **Documentar Processo de Migração:** Adicionar instruções sobre como executar as migrações no README ou em um arquivo de documentação.
-    - [ ] **Integrar Migração no Deploy:** Incluir o processo de migração do Alembic no fluxo de deploy.
+- [x] **Migrações Alembic:**
+    - [x] **Configurar Alembic:** Instalado e configurado o Alembic no projeto backend.
+    - [x] **Gerar Primeira Migração:** Gerada a migração inicial do banco de dados a partir do modelo atual.
+    - [x] **Testar Migração Localmente:** Testada a aplicação com as migrações do Alembic em um ambiente de desenvolvimento local.
+    - [x] **Documentar Processo de Migração:** Adicionadas instruções sobre como executar as migrações no README.md.
+    - [x] **Integrar Migração no Deploy:** Criado `docs/DEPLOYMENT.md` e referenciado no README.md.
 
 ### Médio Prazo (3 a 6 meses)
 
