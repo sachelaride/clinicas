@@ -1,3 +1,8 @@
+"""
+Pydantic schemas for the application.
+
+This file defines the Pydantic models for data validation and serialization.
+"""
 from pydantic import BaseModel, EmailStr, Field
 from typing import List, Optional
 from datetime import date, datetime
@@ -64,7 +69,7 @@ class UserInDBBase(UserBase):
 
 class ClinicaBase(BaseModel):
     nome: str
-    endereco: str
+    endereco: Optional[str] = None
     telefone: Optional[str] = None
     num_guiches: Optional[int] = 1
     tempo_minimo_atendimento: Optional[int] = 30
@@ -97,7 +102,8 @@ class PacienteCreate(PacienteBase):
     pass
 
 class PacienteUpdate(PacienteBase):
-    pass
+    cpf: Optional[str] = None
+    data_nascimento: Optional[date] = None
 
 class PacienteInDBBase(PacienteBase):
     id: int
@@ -117,7 +123,10 @@ class ProfissionalCreate(ProfissionalBase):
     pass
 
 class ProfissionalUpdate(ProfissionalBase):
-    pass
+    user_id: Optional[int] = None
+    especialidade: Optional[str] = None
+    conselho_profissional: Optional[str] = None
+    numero_conselho: Optional[str] = None
 
 class ProfissionalInDBBase(ProfissionalBase):
     id: int
@@ -167,7 +176,8 @@ class TipoTratamentoCreate(TipoTratamentoBase):
     pass
 
 class TipoTratamentoUpdate(TipoTratamentoBase):
-    pass
+    clinica_id: Optional[int] = None
+    nome: Optional[str] = None
 
 class TipoTratamentoInDBBase(TipoTratamentoBase):
     id: int
@@ -234,7 +244,9 @@ class AgendamentoCreate(AgendamentoBase):
     pass
 
 class AgendamentoUpdate(AgendamentoBase):
-    pass
+    paciente_id: Optional[int] = None
+    data: Optional[datetime] = None
+    status: Optional[AgendamentoStatusEnum] = None
 
 class AgendamentoInDBBase(AgendamentoBase):
     id: int
@@ -336,7 +348,10 @@ class LancamentoFinanceiroCreate(LancamentoFinanceiroBase):
     pass
 
 class LancamentoFinanceiroUpdate(LancamentoFinanceiroBase):
-    pass
+    tipo: Optional[LancamentoFinanceiroTipoEnum] = None
+    descricao: Optional[str] = None
+    valor: Optional[Decimal] = Field(default=None, decimal_places=2, max_digits=10)
+    data_vencimento: Optional[date] = None
 
 class LancamentoFinanceiroInDBBase(LancamentoFinanceiroBase):
     id: int

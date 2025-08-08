@@ -55,6 +55,19 @@ O sistema é dividido em módulos que cobrem as principais áreas de uma clínic
 - **Banco de Dados:** PostgreSQL
 - **Frontend:** React, JavaScript, HTML, CSS
 
+## 📂 Estrutura do Projeto
+
+O projeto está organizado nos seguintes diretórios principais:
+
+-   `app/`: Contém o código-fonte do backend FastAPI, incluindo modelos, esquemas, endpoints da API e lógica de negócio.
+-   `frontend/`: Contém o código-fonte do aplicativo React, incluindo componentes, estilos e lógica do frontend.
+-   `auxiliary/`: Contém scripts auxiliares para criação e população do banco de dados, bem como outras ferramentas de suporte.
+-   `tests/`: Contém os testes automatizados para o backend e o frontend.
+-   `alembic.ini`: Arquivo de configuração principal do Alembic para migrações de banco de dados.
+-   `requirements.txt`: Lista as dependências Python do projeto.
+-   `install.md`: Guia detalhado de instalação e configuração do ambiente.
+-   `roadmap.md`: O roadmap do projeto, detalhando o estado atual e as futuras melhorias.
+
 ## 🚀 Instalação
 Para instruções detalhadas de como instalar e configurar o ambiente de desenvolvimento, consulte o arquivo [install.md](install.md).
 
@@ -94,7 +107,7 @@ Para reverter para uma revisão específica (substitua `[REVISAO]` pelo ID da re
 alembic downgrade [REVISAO]
 ```
 
-Para informações sobre como integrar as migrações no processo de deploy, consulte [DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
 
 ## 🗺️ Roadmap
 Temos muitas ideias para o futuro! Confira nosso [roadmap.md](roadmap.md) para ver as próximas funcionalidades e melhorias planejadas para o sistema.

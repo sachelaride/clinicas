@@ -1,3 +1,8 @@
+"""
+Main application file.
+
+This file initializes the FastAPI application, sets up CORS middleware, and includes the API router.
+"""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .api import endpoints

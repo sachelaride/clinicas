@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Table, Container, Form, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { hasPermission } from '../utils/permissions';
 
 const PesquisaSatisfacaoList = () => {
     const [pesquisas, setPesquisas] = useState([]);
@@ -47,12 +48,14 @@ const PesquisaSatisfacaoList = () => {
         pesquisa.comentarios.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const canManagePesquisas = user && (user.perfil === 'ADMIN' || user.perfil === 'COORDENADOR');
+    const canCreatePesquisas = hasPermission(user, 'criar_pesquisas_satisfacao');
+    const canUpdatePesquisas = hasPermission(user, 'atualizar_pesquisas_satisfacao');
+    const canDeletePesquisas = hasPermission(user, 'excluir_pesquisas_satisfacao');
 
     return (
         <Container>
             <h1 className="my-4">Lista de Pesquisas de Satisfação</h1>
-            {canManagePesquisas && (
+            {canCreatePesquisas && (
                 <Button variant="success" className="mb-3" onClick={() => navigate('/pesquisas-satisfacao/new')}>Nova Pesquisa</Button>
             )}
             <Form.Group controlId="search">
@@ -70,7 +73,7 @@ const PesquisaSatisfacaoList = () => {
                         <th>Data da Pesquisa</th>
                         <th>Nota NPS</th>
                         <th>Comentários</th>
-                        {canManagePesquisas && <th>Ações</th>}
+                        {(canUpdatePesquisas || canDeletePesquisas) && <th>Ações</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -80,10 +83,10 @@ const PesquisaSatisfacaoList = () => {
                             <td>{new Date(pesquisa.data_pesquisa).toLocaleDateString()}</td>
                             <td>{pesquisa.nota_nps}</td>
                             <td>{pesquisa.comentarios}</td>
-                            {canManagePesquisas && (
+                            {(canUpdatePesquisas || canDeletePesquisas) && (
                                 <td>
-                                    <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/pesquisas-satisfacao/${pesquisa.id}/edit`)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => openDeleteModal(pesquisa)}>Excluir</Button>
+                                    {canUpdatePesquisas && <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/pesquisas-satisfacao/${pesquisa.id}/edit`)}>Editar</Button>}
+                                    {canDeletePesquisas && <Button variant="danger" size="sm" onClick={() => openDeleteModal(pesquisa)}>Excluir</Button>}
                                 </td>
                             )}
                         </tr>

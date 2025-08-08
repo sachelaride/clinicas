@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Table, Container, Form, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { hasPermission } from '../utils/permissions';
 
 const ClinicaList = () => {
     const [clinicas, setClinicas] = useState([]);
@@ -47,12 +48,14 @@ const ClinicaList = () => {
         clinica.endereco.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const canManageClinicas = user && (user.perfil === 'ADMIN' || user.perfil === 'COORDENADOR');
+    const canCreateClinicas = hasPermission(user, 'criar_clinicas');
+    const canUpdateClinicas = hasPermission(user, 'atualizar_clinicas');
+    const canDeleteClinicas = hasPermission(user, 'excluir_clinicas');
 
     return (
         <Container>
             <h1 className="my-4">Lista de Clínicas</h1>
-            {canManageClinicas && (
+            {canCreateClinicas && (
                 <Button variant="success" className="mb-3" onClick={() => navigate('/clinicas/new')}>Nova Clínica</Button>
             )}
             <Form.Group controlId="search">
@@ -71,7 +74,7 @@ const ClinicaList = () => {
                         <th>Telefone</th>
                         <th>Guichês</th>
                         <th>Tempo Mínimo Atendimento</th>
-                        {canManageClinicas && <th>Ações</th>}
+                        {(canUpdateClinicas || canDeleteClinicas) && <th>Ações</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -82,10 +85,10 @@ const ClinicaList = () => {
                             <td>{clinica.telefone}</td>
                             <td>{clinica.num_guiches}</td>
                             <td>{clinica.tempo_minimo_atendimento} min</td>
-                            {canManageClinicas && (
+                            {(canUpdateClinicas || canDeleteClinicas) && (
                                 <td>
-                                    <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/clinicas/${clinica.id}/edit`)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => openDeleteModal(clinica)}>Excluir</Button>
+                                    {canUpdateClinicas && <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/clinicas/${clinica.id}/edit`)}>Editar</Button>}
+                                    {canDeleteClinicas && <Button variant="danger" size="sm" onClick={() => openDeleteModal(clinica)}>Excluir</Button>}
                                 </td>
                             )}
                         </tr>

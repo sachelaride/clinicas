@@ -70,14 +70,29 @@ A seguir, são apresentadas sugestões de evolução para o sistema.
         - [ ] **Documentar API:** Adicionar documentação detalhada.
     - **Gateways de Pagamento:** Integrar com APIs de pagamento (ex: Stripe, PagSeguro) para cobrança online de faturas e serviços.
     - **Sistemas de Laboratórios:** Criar endpoints para recebimento automático de resultados de exames.
-- [ ] **Notificações em Tempo Real:** Implementar notificações (via WebSockets) para eventos importantes, como:
-    - [ ] Lembretes de consulta para pacientes (D-2, D-1, no dia).
-    - [ ] Avisos de chegada de paciente para profissionais.
-    - [ ] Alertas sobre atualizações em prontuários.
-    - [ ] Canais de comunicação: WhatsApp, SMS e E-mail (configuráveis por paciente).
-    - [ ] Backend: Job agendado (APScheduler/Celery), lógica de envio de mensagens, endpoints de confirmação/cancelamento.
-    - [ ] Frontend: Banner de lembretes, botão "Enviar lembrete agora", filtros por status, indicador em tempo real.
-    - [ ] Modelagem de dados: `preferred_channel`, `confirmation_token`, `status` na tabela de agendamentos; nova tabela `notifications`.
+- [ ] **Notificações em Tempo Real:**
+    - [ ] **Análise e Design:**
+        - [ ] Definir provedores de serviço de SMS/WhatsApp/E-mail.
+        - [ ] Projetar a arquitetura de WebSockets para notificações em tempo real.
+        - [ ] Modelar as tabelas de banco de dados para notificações e status de envio.
+    - [ ] **Desenvolvimento Backend:**
+        - [ ] Implementar serviço de agendamento de tarefas (APScheduler/Celery Beat) para lembretes.
+        - [ ] Desenvolver lógica de envio de mensagens para diferentes canais (SMS, WhatsApp, E-mail).
+        - [ ] Criar endpoints para confirmação/cancelamento de agendamentos via link.
+        - [ ] Implementar rastreamento de métricas de envio e interação com notificações.
+        - [ ] Configurar WebSockets no backend para envio de notificações em tempo real.
+    - [ ] **Desenvolvimento Frontend:**
+        - [ ] Desenvolver UI para exibir status de lembretes e notificações.
+        - [ ] Implementar funcionalidade de envio manual de lembretes.
+        - [ ] Adicionar filtros por status de notificação nas listas de agendamento.
+        - [ ] Integrar WebSockets para atualizações em tempo real na UI.
+    - [ ] **Testes:**
+        - [ ] Escrever testes unitários para a lógica de envio e agendamento.
+        - [ ] Escrever testes de integração para os endpoints de notificação.
+        - [ ] Testar a funcionalidade de WebSockets.
+    - [ ] **Documentação:**
+        - [ ] Documentar a API de notificações.
+        - [ ] Documentar o processo de configuração dos provedores de serviço.
 - [ ] **Observabilidade e Alertas:**
     - [ ] Logs estruturados (JSON) com correlação de requisições.
     - [ ] Métricas chave: tempo de resposta, taxa de erro, jobs de lembrete.

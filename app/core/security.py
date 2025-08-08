@@ -1,3 +1,8 @@
+"""
+Security-related utilities.
+
+This file contains functions for password hashing, and creating and decoding JWT tokens.
+"""
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from typing import Optional

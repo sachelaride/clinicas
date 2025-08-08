@@ -1,3 +1,8 @@
+"""
+Database configuration and session management.
+
+This file configures the database connection and provides a function to get a database session.
+"""
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base

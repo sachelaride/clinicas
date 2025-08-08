@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Table, Container, Form, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { hasPermission } from '../utils/permissions';
 
 const CupomDescontoList = () => {
     const [cupons, setCupons] = useState([]);
@@ -47,12 +48,14 @@ const CupomDescontoList = () => {
         (cupom.campanha__nome && cupom.campanha__nome.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
-    const canManageCupons = user && (user.perfil === 'ADMIN' || user.perfil === 'COORDENADOR');
+    const canCreateCupons = hasPermission(user, 'criar_cupons_desconto');
+    const canUpdateCupons = hasPermission(user, 'atualizar_cupons_desconto');
+    const canDeleteCupons = hasPermission(user, 'excluir_cupons_desconto');
 
     return (
         <Container>
             <h1 className="my-4">Lista de Cupons de Desconto</h1>
-            {canManageCupons && (
+            {canCreateCupons && (
                 <Button variant="success" className="mb-3" onClick={() => navigate('/cupons-desconto/new')}>Novo Cupom</Button>
             )}
             <Form.Group controlId="search">
@@ -71,7 +74,7 @@ const CupomDescontoList = () => {
                         <th>Data de Validade</th>
                         <th>Ativo</th>
                         <th>Campanha</th>
-                        {canManageCupons && <th>Ações</th>}
+                        {(canUpdateCupons || canDeleteCupons) && <th>Ações</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -82,10 +85,10 @@ const CupomDescontoList = () => {
                             <td>{new Date(cupom.data_validade).toLocaleDateString()}</td>
                             <td>{cupom.ativo ? 'Sim' : 'Não'}</td>
                             <td>{cupom.campanha__nome || '-'}</td>
-                            {canManageCupons && (
+                            {(canUpdateCupons || canDeleteCupons) && (
                                 <td>
-                                    <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/cupons-desconto/${cupom.id}/edit`)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => openDeleteModal(cupom)}>Excluir</Button>
+                                    {canUpdateCupons && <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/cupons-desconto/${cupom.id}/edit`)}>Editar</Button>}
+                                    {canDeleteCupons && <Button variant="danger" size="sm" onClick={() => openDeleteModal(cupom)}>Excluir</Button>}
                                 </td>
                             )}
                         </tr>

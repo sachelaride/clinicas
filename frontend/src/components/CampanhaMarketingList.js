@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Table, Container, Form, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { hasPermission } from '../utils/permissions';
 
 const CampanhaMarketingList = () => {
     const [campanhas, setCampanhas] = useState([]);
@@ -47,12 +48,14 @@ const CampanhaMarketingList = () => {
         campanha.tipo.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const canManageCampanhas = user && (user.perfil === 'ADMIN' || user.perfil === 'COORDENADOR');
+    const canCreateCampanhas = hasPermission(user, 'criar_campanhas_marketing');
+    const canUpdateCampanhas = hasPermission(user, 'atualizar_campanhas_marketing');
+    const canDeleteCampanhas = hasPermission(user, 'excluir_campanhas_marketing');
 
     return (
         <Container>
             <h1 className="my-4">Lista de Campanhas de Marketing</h1>
-            {canManageCampanhas && (
+            {canCreateCampanhas && (
                 <Button variant="success" className="mb-3" onClick={() => navigate('/campanhas-marketing/new')}>Nova Campanha</Button>
             )}
             <Form.Group controlId="search">
@@ -70,7 +73,7 @@ const CampanhaMarketingList = () => {
                         <th>Tipo</th>
                         <th>Data de Início</th>
                         <th>Data de Fim</th>
-                        {canManageCampanhas && <th>Ações</th>}
+                        {(canUpdateCampanhas || canDeleteCampanhas) && <th>Ações</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -80,10 +83,10 @@ const CampanhaMarketingList = () => {
                             <td>{campanha.tipo}</td>
                             <td>{new Date(campanha.data_inicio).toLocaleDateString()}</td>
                             <td>{campanha.data_fim ? new Date(campanha.data_fim).toLocaleDateString() : '-'}</td>
-                            {canManageCampanhas && (
+                            {(canUpdateCampanhas || canDeleteCampanhas) && (
                                 <td>
-                                    <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/campanhas-marketing/${campanha.id}/edit`)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => openDeleteModal(campanha)}>Excluir</Button>
+                                    {canUpdateCampanhas && <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/campanhas-marketing/${campanha.id}/edit`)}>Editar</Button>}
+                                    {canDeleteCampanhas && <Button variant="danger" size="sm" onClick={() => openDeleteModal(campanha)}>Excluir</Button>}
                                 </td>
                             )}
                         </tr>

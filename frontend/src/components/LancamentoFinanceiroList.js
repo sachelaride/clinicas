@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Table, Container, Button, Modal, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { hasPermission } from '../utils/permissions';
 
 const LancamentoFinanceiroList = () => {
     const [lancamentos, setLancamentos] = useState([]);
@@ -47,12 +48,14 @@ const LancamentoFinanceiroList = () => {
         lancamento.descricao.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const canManageLancamentos = user && (user.perfil === 'ADMIN' || user.perfil === 'COORDENADOR');
+    const canCreateLancamentos = hasPermission(user, 'criar_lancamentos_financeiros');
+    const canUpdateLancamentos = hasPermission(user, 'atualizar_lancamentos_financeiros');
+    const canDeleteLancamentos = hasPermission(user, 'excluir_lancamentos_financeiros');
 
     return (
         <Container>
             <h1 className="my-4">Lançamentos Financeiros</h1>
-            {canManageLancamentos && (
+            {canCreateLancamentos && (
                 <Button variant="success" className="mb-3" onClick={() => navigate('/lancamentos-financeiros/new')}>Novo Lançamento</Button>
             )}
 
@@ -82,7 +85,7 @@ const LancamentoFinanceiroList = () => {
                         <th>Valor</th>
                         <th>Vencimento</th>
                         <th>Pagamento</th>
-                        {canManageLancamentos && <th>Ações</th>}
+                        {(canUpdateLancamentos || canDeleteLancamentos) && <th>Ações</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -93,10 +96,10 @@ const LancamentoFinanceiroList = () => {
                             <td>R$ {parseFloat(lancamento.valor).toFixed(2)}</td>
                             <td>{lancamento.data_vencimento}</td>
                             <td>{lancamento.data_pagamento || '-'}</td>
-                            {canManageLancamentos && (
+                            {(canUpdateLancamentos || canDeleteLancamentos) && (
                                 <td>
-                                    <Button variant="primary" size="sm" className="me-2" onClick={() => navigate(`/lancamentos-financeiros/${lancamento.id}/edit`)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => openDeleteModal(lancamento)}>Excluir</Button>
+                                    {canUpdateLancamentos && <Button variant="primary" size="sm" className="me-2" onClick={() => navigate(`/lancamentos-financeiros/${lancamento.id}/edit`)}>Editar</Button>}
+                                    {canDeleteLancamentos && <Button variant="danger" size="sm" onClick={() => openDeleteModal(lancamento)}>Excluir</Button>}
                                 </td>
                             )}
                         </tr>

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Table, Container, Form, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { hasPermission } from '../utils/permissions';
 
 const DocumentoList = () => {
     const [documentos, setDocumentos] = useState([]);
@@ -47,12 +48,14 @@ const DocumentoList = () => {
         return pacienteNome.toLowerCase().includes(searchTerm.toLowerCase());
     });
 
-    const canManageDocumentos = user && (user.perfil === 'ADMIN' || user.perfil === 'COORDENADOR');
+    const canCreateDocumentos = hasPermission(user, 'criar_documentos');
+    const canUpdateDocumentos = hasPermission(user, 'atualizar_documentos');
+    const canDeleteDocumentos = hasPermission(user, 'excluir_documentos');
 
     return (
         <Container>
             <h1 className="my-4">Lista de Documentos</h1>
-            {canManageDocumentos && (
+            {canCreateDocumentos && (
                 <Button variant="success" className="mb-3" onClick={() => navigate('/documentos/new')}>Novo Documento</Button>
             )}
             <Form.Group controlId="search">
@@ -70,7 +73,7 @@ const DocumentoList = () => {
                         <th>Pasta</th>
                         <th>Arquivo</th>
                         <th>Data de Upload</th>
-                        {canManageDocumentos && <th>Ações</th>}
+                        {(canUpdateDocumentos || canDeleteDocumentos) && <th>Ações</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -80,10 +83,10 @@ const DocumentoList = () => {
                             <td>{documento.pasta_nome}</td>
                             <td><a href={documento.arquivo} target="_blank" rel="noreferrer">{documento.arquivo}</a></td>
                             <td>{new Date(documento.uploaded_at).toLocaleString()}</td>
-                            {canManageDocumentos && (
+                            {(canUpdateDocumentos || canDeleteDocumentos) && (
                                 <td>
-                                    <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/documentos/${documento.id}/edit`)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => openDeleteModal(documento)}>Excluir</Button>
+                                    {canUpdateDocumentos && <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/documentos/${documento.id}/edit`)}>Editar</Button>}
+                                    {canDeleteDocumentos && <Button variant="danger" size="sm" onClick={() => openDeleteModal(documento)}>Excluir</Button>}
                                 </td>
                             )}
                         </tr>

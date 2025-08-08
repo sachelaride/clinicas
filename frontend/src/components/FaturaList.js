@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Table, Container, Form, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { hasPermission } from '../utils/permissions';
 
 const FaturaList = () => {
     const [faturas, setFaturas] = useState([]);
@@ -47,12 +48,14 @@ const FaturaList = () => {
         fatura.status.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const canManageFaturas = user && (user.perfil === 'ADMIN' || user.perfil === 'COORDENADOR');
+    const canCreateFaturas = hasPermission(user, 'criar_faturas');
+    const canUpdateFaturas = hasPermission(user, 'atualizar_faturas');
+    const canDeleteFaturas = hasPermission(user, 'excluir_faturas');
 
     return (
         <Container>
             <h1 className="my-4">Lista de Faturas</h1>
-            {canManageFaturas && (
+            {canCreateFaturas && (
                 <Button variant="success" className="mb-3" onClick={() => navigate('/faturas/new')}>Nova Fatura</Button>
             )}
             <Form.Group controlId="search">
@@ -70,7 +73,7 @@ const FaturaList = () => {
                         <th>Mês de Referência</th>
                         <th>Valor Total</th>
                         <th>Status</th>
-                        {canManageFaturas && <th>Ações</th>}
+                        {(canUpdateFaturas || canDeleteFaturas) && <th>Ações</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -80,10 +83,10 @@ const FaturaList = () => {
                             <td>{new Date(fatura.mes_referencia).toLocaleDateString()}</td>
                             <td>R$ {parseFloat(fatura.valor_total).toFixed(2)}</td>
                             <td>{fatura.status}</td>
-                            {canManageFaturas && (
+                            {(canUpdateFaturas || canDeleteFaturas) && (
                                 <td>
-                                    <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/faturas/${fatura.id}/edit`)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => openDeleteModal(fatura)}>Excluir</Button>
+                                    {canUpdateFaturas && <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/faturas/${fatura.id}/edit`)}>Editar</Button>}
+                                    {canDeleteFaturas && <Button variant="danger" size="sm" onClick={() => openDeleteModal(fatura)}>Excluir</Button>}
                                 </td>
                             )}
                         </tr>

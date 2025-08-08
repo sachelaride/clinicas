@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Table, Container, Form, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { hasPermission } from '../utils/permissions';
 
 const LeadList = () => {
     const [leads, setLeads] = useState([]);
@@ -48,12 +49,14 @@ const LeadList = () => {
         lead.telefone.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const canManageLeads = user && (user.perfil === 'ADMIN' || user.perfil === 'COORDENADOR');
+    const canCreateLeads = hasPermission(user, 'criar_leads');
+    const canUpdateLeads = hasPermission(user, 'atualizar_leads');
+    const canDeleteLeads = hasPermission(user, 'excluir_leads');
 
     return (
         <Container>
             <h1 className="my-4">Lista de Leads</h1>
-            {canManageLeads && (
+            {canCreateLeads && (
                 <Button variant="success" className="mb-3" onClick={() => navigate('/crm/new')}>Novo Lead</Button>
             )}
             <Form.Group controlId="search">
@@ -72,7 +75,7 @@ const LeadList = () => {
                         <th>Telefone</th>
                         <th>Origem</th>
                         <th>Status</th>
-                        {canManageLeads && <th>Ações</th>}
+                        {(canUpdateLeads || canDeleteLeads) && <th>Ações</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -83,10 +86,10 @@ const LeadList = () => {
                             <td>{lead.telefone}</td>
                             <td>{lead.origem}</td>
                             <td>{lead.status}</td>
-                            {canManageLeads && (
+                            {(canUpdateLeads || canDeleteLeads) && (
                                 <td>
-                                    <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/crm/${lead.id}/edit`)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => openDeleteModal(lead)}>Excluir</Button>
+                                    {canUpdateLeads && <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/crm/${lead.id}/edit`)}>Editar</Button>}
+                                    {canDeleteLeads && <Button variant="danger" size="sm" onClick={() => openDeleteModal(lead)}>Excluir</Button>}
                                 </td>
                             )}
                         </tr>

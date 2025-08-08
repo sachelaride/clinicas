@@ -1,3 +1,8 @@
+"""
+API endpoints for the application.
+
+This file defines the API routes for all resources in the application.
+"""
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional

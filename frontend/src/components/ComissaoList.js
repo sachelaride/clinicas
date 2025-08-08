@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Table, Container, Form, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { hasPermission } from '../utils/permissions';
 
 const ComissaoList = () => {
     const [comissoes, setComissoes] = useState([]);
@@ -47,12 +48,14 @@ const ComissaoList = () => {
         comissao.atendimento__id.toString().includes(searchTerm.toLowerCase())
     );
 
-    const canManageComissoes = user && (user.perfil === 'ADMIN' || user.perfil === 'COORDENADOR');
+    const canCreateComissoes = hasPermission(user, 'criar_comissoes');
+    const canUpdateComissoes = hasPermission(user, 'atualizar_comissoes');
+    const canDeleteComissoes = hasPermission(user, 'excluir_comissoes');
 
     return (
         <Container>
             <h1 className="my-4">Lista de Comissões</h1>
-            {canManageComissoes && (
+            {canCreateComissoes && (
                 <Button variant="success" className="mb-3" onClick={() => navigate('/comissoes/new')}>Nova Comissão</Button>
             )}
             <Form.Group controlId="search">
@@ -70,7 +73,7 @@ const ComissaoList = () => {
                         <th>Atendimento ID</th>
                         <th>Valor</th>
                         <th>Paga</th>
-                        {canManageComissoes && <th>Ações</th>}
+                        {(canUpdateComissoes || canDeleteComissoes) && <th>Ações</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -80,10 +83,10 @@ const ComissaoList = () => {
                             <td>{comissao.atendimento__id}</td>
                             <td>R$ {parseFloat(comissao.valor).toFixed(2)}</td>
                             <td>{comissao.paga ? 'Sim' : 'Não'}</td>
-                            {canManageComissoes && (
+                            {(canUpdateComissoes || canDeleteComissoes) && (
                                 <td>
-                                    <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/comissoes/${comissao.id}/edit`)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => openDeleteModal(comissao)}>Excluir</Button>
+                                    {canUpdateComissoes && <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/comissoes/${comissao.id}/edit`)}>Editar</Button>}
+                                    {canDeleteComissoes && <Button variant="danger" size="sm" onClick={() => openDeleteModal(comissao)}>Excluir</Button>}
                                 </td>
                             )}
                         </tr>

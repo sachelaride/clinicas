@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Table, Container, Form, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { hasPermission } from '../utils/permissions';
 
 const PacienteList = () => {
     const [pacientes, setPacientes] = useState([]);
@@ -46,12 +47,14 @@ const PacienteList = () => {
         paciente.nome.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const canManagePacientes = user && (user.perfil === 'ADMIN' || user.perfil === 'COORDENADOR' || user.perfil === 'ATENDENTE');
+    const canCreatePacientes = hasPermission(user, 'criar_pacientes');
+    const canUpdatePacientes = hasPermission(user, 'atualizar_pacientes');
+    const canDeletePacientes = hasPermission(user, 'excluir_pacientes');
 
     return (
         <Container>
             <h1 className="my-4">Lista de Pacientes</h1>
-            {canManagePacientes && (
+            {canCreatePacientes && (
                 <Button variant="success" className="mb-3" onClick={() => navigate('/pacientes/new')}>Novo Paciente</Button>
             )}
             <Form.Group controlId="search">
@@ -69,7 +72,7 @@ const PacienteList = () => {
                         <th>CPF</th>
                         <th>Email</th>
                         <th>Telefone</th>
-                        {canManagePacientes && <th>Ações</th>}
+                        {(canUpdatePacientes || canDeletePacientes) && <th>Ações</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -79,10 +82,10 @@ const PacienteList = () => {
                             <td>{paciente.cpf}</td>
                             <td>{paciente.email}</td>
                             <td>{paciente.telefone}</td>
-                            {canManagePacientes && (
+                            {(canUpdatePacientes || canDeletePacientes) && (
                                 <td>
-                                    <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/pacientes/${paciente.id}/edit`)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => openDeleteModal(paciente)}>Excluir</Button>
+                                    {canUpdatePacientes && <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/pacientes/${paciente.id}/edit`)}>Editar</Button>}
+                                    {canDeletePacientes && <Button variant="danger" size="sm" onClick={() => openDeleteModal(paciente)}>Excluir</Button>}
                                 </td>
                             )}
                         </tr>

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Table, Container, Form, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { hasPermission } from '../utils/permissions';
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
@@ -47,12 +48,14 @@ const UserList = () => {
         user.perfil.nome.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const canManageUsers = user && user.perfil && (user.perfil.nome === 'ADMIN' || user.perfil.nome === 'COORDENADOR');
+    const canCreateUsers = hasPermission(user, 'criar_usuarios');
+    const canUpdateUsers = hasPermission(user, 'atualizar_usuarios');
+    const canDeleteUsers = hasPermission(user, 'excluir_usuarios');
 
     return (
         <Container>
             <h1 className="my-4">Lista de Usuários</h1>
-            {canManageUsers && (
+            {canCreateUsers && (
                 <Button variant="success" className="mb-3" onClick={() => navigate('/users/new')}>Novo Usuário</Button>
             )}
             <Form.Group controlId="search">
@@ -69,7 +72,7 @@ const UserList = () => {
                         <th>Nome de Usuário</th>
                         <th>Email</th>
                         <th>Perfil</th>
-                        {canManageUsers && <th>Ações</th>}
+                        {(canUpdateUsers || canDeleteUsers) && <th>Ações</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -78,10 +81,10 @@ const UserList = () => {
                             <td>{user.username}</td>
                             <td>{user.email}</td>
                             <td>{user.perfil.nome}</td>
-                            {canManageUsers && (
+                            {(canUpdateUsers || canDeleteUsers) && (
                                 <td>
-                                    <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/users/${user.id}/edit`)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => openDeleteModal(user)}>Excluir</Button>
+                                    {canUpdateUsers && <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/users/${user.id}/edit`)}>Editar</Button>}
+                                    {canDeleteUsers && <Button variant="danger" size="sm" onClick={() => openDeleteModal(user)}>Excluir</Button>}
                                 </td>
                             )}
                         </tr>

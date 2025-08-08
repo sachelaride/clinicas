@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Table, Container, Form, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { hasPermission } from '../utils/permissions';
 
 const AgendamentoList = () => {
     const [agendamentos, setAgendamentos] = useState([]);
@@ -47,12 +48,14 @@ const AgendamentoList = () => {
         return pacienteNome.toLowerCase().includes(searchTerm.toLowerCase());
     });
 
-    const canManageAgendamentos = user && (user.perfil === 'ADMIN' || user.perfil === 'COORDENADOR' || user.perfil === 'ATENDENTE');
+    const canCreateAgendamentos = hasPermission(user, 'criar_agendamentos');
+    const canUpdateAgendamentos = hasPermission(user, 'atualizar_agendamentos');
+    const canDeleteAgendamentos = hasPermission(user, 'excluir_agendamentos');
 
     return (
         <Container>
             <h1 className="my-4">Lista de Agendamentos</h1>
-            {canManageAgendamentos && (
+            {canCreateAgendamentos && (
                 <Button variant="success" className="mb-3" onClick={() => navigate('/agendamentos/new')}>Novo Agendamento</Button>
             )}
             <Form.Group controlId="search">
@@ -70,7 +73,7 @@ const AgendamentoList = () => {
                         <th>Profissional</th>
                         <th>Data</th>
                         <th>Status</th>
-                        {canManageAgendamentos && <th>Ações</th>}
+                        {(canUpdateAgendamentos || canDeleteAgendamentos) && <th>Ações</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -80,10 +83,10 @@ const AgendamentoList = () => {
                             <td>{agendamento.profissional_username}</td>
                             <td>{new Date(agendamento.data).toLocaleString()}</td>
                             <td>{agendamento.status}</td>
-                            {canManageAgendamentos && (
+                            {(canUpdateAgendamentos || canDeleteAgendamentos) && (
                                 <td>
-                                    <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/agendamentos/${agendamento.id}/edit`)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => openDeleteModal(agendamento)}>Excluir</Button>
+                                    {canUpdateAgendamentos && <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/agendamentos/${agendamento.id}/edit`)}>Editar</Button>}
+                                    {canDeleteAgendamentos && <Button variant="danger" size="sm" onClick={() => openDeleteModal(agendamento)}>Excluir</Button>}
                                 </td>
                             )}
                         </tr>

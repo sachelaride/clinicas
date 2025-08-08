@@ -1,3 +1,8 @@
+/**
+ * Main application component.
+ * 
+ * This component sets up the main application routing.
+ */
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';

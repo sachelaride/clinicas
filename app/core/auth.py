@@ -1,3 +1,8 @@
+"""
+Authentication and authorization utilities.
+
+This file contains functions for getting the current user, checking for active users, and checking for permissions.
+"""
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session, joinedload

@@ -1,3 +1,8 @@
+"""
+Database models for the application.
+
+This file defines the SQLAlchemy models for all tables in the database.
+"""
 from sqlalchemy import Column, Integer, String, Boolean, Date, DateTime, ForeignKey, Text, Numeric, UniqueConstraint, Table
 from sqlalchemy.orm import relationship
 from datetime import datetime

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Table, Container, Form, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { hasPermission } from '../utils/permissions';
 
 const AtendimentoList = () => {
     const [atendimentos, setAtendimentos] = useState([]);
@@ -47,12 +48,14 @@ const AtendimentoList = () => {
         return pacienteNome.toLowerCase().includes(searchTerm.toLowerCase());
     });
 
-    const canManageAtendimentos = user && (user.perfil === 'ADMIN' || user.perfil === 'COORDENADOR' || user.perfil === 'ATENDENTE');
+    const canCreateAtendimentos = hasPermission(user, 'criar_atendimentos');
+    const canUpdateAtendimentos = hasPermission(user, 'atualizar_atendimentos');
+    const canDeleteAtendimentos = hasPermission(user, 'excluir_atendimentos');
 
     return (
         <Container>
             <h1 className="my-4">Lista de Atendimentos</h1>
-            {canManageAtendimentos && (
+            {canCreateAtendimentos && (
                 <Button variant="success" className="mb-3" onClick={() => navigate('/atendimentos/new')}>Novo Atendimento</Button>
             )}
             <Form.Group controlId="search">
@@ -70,7 +73,7 @@ const AtendimentoList = () => {
                         <th>Profissional</th>
                         <th>Data de Início</th>
                         <th>Status</th>
-                        {canManageAtendimentos && <th>Ações</th>}
+                        {(canUpdateAtendimentos || canDeleteAtendimentos) && <th>Ações</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -80,10 +83,10 @@ const AtendimentoList = () => {
                             <td>{atendimento.profissional_username}</td>
                             <td>{new Date(atendimento.data_inicio).toLocaleString()}</td>
                             <td>{atendimento.status}</td>
-                            {canManageAtendimentos && (
+                            {(canUpdateAtendimentos || canDeleteAtendimentos) && (
                                 <td>
-                                    <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/atendimentos/${atendimento.id}/edit`)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => openDeleteModal(atendimento)}>Excluir</Button>
+                                    {canUpdateAtendimentos && <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/atendimentos/${atendimento.id}/edit`)}>Editar</Button>}
+                                    {canDeleteAtendimentos && <Button variant="danger" size="sm" onClick={() => openDeleteModal(atendimento)}>Excluir</Button>}
                                 </td>
                             )}
                         </tr>

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Table, Container, Form, Button, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { hasPermission } from '../utils/permissions';
 
 const TipoTratamentoList = () => {
     const [tiposTratamento, setTiposTratamento] = useState([]);
@@ -47,12 +48,14 @@ const TipoTratamentoList = () => {
         tipo.descricao.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const canManageTiposTratamento = user && (user.perfil === 'ADMIN' || user.perfil === 'COORDENADOR');
+    const canCreateTiposTratamento = hasPermission(user, 'criar_tipos_tratamento');
+    const canUpdateTiposTratamento = hasPermission(user, 'atualizar_tipos_tratamento');
+    const canDeleteTiposTratamento = hasPermission(user, 'excluir_tipos_tratamento');
 
     return (
         <Container>
             <h1 className="my-4">Lista de Tipos de Tratamento</h1>
-            {canManageTiposTratamento && (
+            {canCreateTiposTratamento && (
                 <Button variant="success" className="mb-3" onClick={() => navigate('/tipos-tratamento/new')}>Novo Tipo de Tratamento</Button>
             )}
             <Form.Group controlId="search">
@@ -70,7 +73,7 @@ const TipoTratamentoList = () => {
                         <th>Descrição</th>
                         <th>Tempo Mínimo Atendimento</th>
                         <th>Clínica</th>
-                        {canManageTiposTratamento && <th>Ações</th>}
+                        {(canUpdateTiposTratamento || canDeleteTiposTratamento) && <th>Ações</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -80,10 +83,10 @@ const TipoTratamentoList = () => {
                             <td>{tipo.descricao}</td>
                             <td>{tipo.tempo_minimo_atendimento} min</td>
                             <td>{tipo.clinica_nome}</td>
-                            {canManageTiposTratamento && (
+                            {(canUpdateTiposTratamento || canDeleteTiposTratamento) && (
                                 <td>
-                                    <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/tipos-tratamento/${tipo.id}/edit`)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => openDeleteModal(tipo)}>Excluir</Button>
+                                    {canUpdateTiposTratamento && <Button variant="primary" size="sm" className="mr-2" onClick={() => navigate(`/tipos-tratamento/${tipo.id}/edit`)}>Editar</Button>}
+                                    {canDeleteTiposTratamento && <Button variant="danger" size="sm" onClick={() => openDeleteModal(tipo)}>Excluir</Button>}
                                 </td>
                             )}
                         </tr>

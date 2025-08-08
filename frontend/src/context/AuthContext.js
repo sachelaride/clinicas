@@ -1,3 +1,8 @@
+/**
+ * Authentication context
+ * 
+ * This context provides user authentication state to the application.
+ */
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 

@@ -14,8 +14,6 @@ const localizer = momentLocalizer(moment);
 const Dashboard = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const [clinicaNome, setClinicaNome] = useState('Não definida');
-    const [agendamentos, setAgendamentos] = useState([]);
     const [calendarEvents, setCalendarEvents] = useState([]);
     const [currentView, setCurrentView] = useState('month'); // Estado para a visualização atual
     const [currentDate, setCurrentDate] = useState(new Date()); // Estado para a data atual
@@ -23,21 +21,9 @@ const Dashboard = () => {
     useEffect(() => {
         if (!user) return; // Só executa se o usuário estiver logado
 
-        if (user.clinica_id) {
-            axios.get(`http://127.0.0.1:8000/api/clinicas/${user.clinica_id}/`)
-                .then(response => {
-                    setClinicaNome(response.data.nome);
-                })
-                .catch(error => {
-                    console.error('Erro ao buscar nome da clínica:', error);
-                    setClinicaNome('Erro ao carregar');
-                });
-        }
-
         // Buscar agendamentos para o calendário
         axios.get('http://127.0.0.1:8000/api/agendamentos/')
             .then(response => {
-                setAgendamentos(response.data);
                 const events = response.data.map(agendamento => ({
                     title: `Agendamento: ${agendamento.paciente_nome} (${agendamento.profissional_username})`,
                     start: new Date(agendamento.data),

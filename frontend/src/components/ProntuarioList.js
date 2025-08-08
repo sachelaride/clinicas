@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Table, Container, Button, Modal, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { hasPermission } from '../utils/permissions';
 
 const ProntuarioList = () => {
     const [prontuarios, setProntuarios] = useState([]);
@@ -46,12 +47,14 @@ const ProntuarioList = () => {
         prontuario.paciente_nome.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const canManageProntuarios = user && (user.perfil === 'ADMIN' || user.perfil === 'COORDENADOR' || user.perfil === 'PROFISSIONAL');
+    const canCreateProntuarios = hasPermission(user, 'criar_prontuarios');
+    const canUpdateProntuarios = hasPermission(user, 'atualizar_prontuarios');
+    const canDeleteProntuarios = hasPermission(user, 'excluir_prontuarios');
 
     return (
         <Container>
             <h1 className="my-4">Lista de Prontuários</h1>
-            {canManageProntuarios && (
+            {canCreateProntuarios && (
                 <Button variant="success" className="mb-3" onClick={() => navigate('/prontuarios/new')}>Novo Prontuário</Button>
             )}
             <Form.Group controlId="search">
@@ -69,7 +72,7 @@ const ProntuarioList = () => {
                         <th>Paciente</th>
                         <th>Data de Criação</th>
                         <th>Finalizado</th>
-                        {canManageProntuarios && <th>Ações</th>}
+                        {(canUpdateProntuarios || canDeleteProntuarios) && <th>Ações</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -79,10 +82,10 @@ const ProntuarioList = () => {
                             <td>{prontuario.paciente_nome}</td>
                             <td>{new Date(prontuario.data_criacao).toLocaleDateString()}</td>
                             <td>{prontuario.is_finalized ? 'Sim' : 'Não'}</td>
-                            {canManageProntuarios && (
+                            {(canUpdateProntuarios || canDeleteProntuarios) && (
                                 <td>
-                                    <Button variant="primary" size="sm" className="me-2" onClick={() => navigate(`/prontuarios/${prontuario.id}/edit`)}>Editar</Button>
-                                    <Button variant="danger" size="sm" onClick={() => openDeleteModal(prontuario)}>Excluir</Button>
+                                    {canUpdateProntuarios && <Button variant="primary" size="sm" className="me-2" onClick={() => navigate(`/prontuarios/${prontuario.id}/edit`)}>Editar</Button>}
+                                    {canDeleteProntuarios && <Button variant="danger" size="sm" onClick={() => openDeleteModal(prontuario)}>Excluir</Button>}
                                 </td>
                             )}
                         </tr>
