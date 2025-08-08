@@ -84,11 +84,16 @@ A seguir, são apresentadas sugestões de evolução para o sistema.
 
 ### Médio Prazo (3 a 6 meses)
 
-- **API para Integrações:** Desenvolver uma API RESTful segura para permitir a integração do sistema com serviços externos.
-    - **Sugestão de Implementação:**
-        - **Plataformas de Telemedicina:** Definir endpoints para agendamento e sincronização de status de consultas online.
-        - **Gateways de Pagamento:** Integrar com APIs de pagamento (ex: Stripe, PagSeguro) para cobrança online de faturas e serviços.
-        - **Sistemas de Laboratórios:** Criar endpoints para recebimento automático de resultados de exames.
+- **API para Integrações:**
+    - **Plataformas de Telemedicina:**
+        - [ ] **Definir Requisitos:** Identificar plataformas e dados necessários.
+        - [ ] **Projetar Endpoints:** Criar o design dos endpoints da API.
+        - [ ] **Implementar Autenticação/Autorização:** Garantir a segurança dos endpoints.
+        - [ ] **Desenvolver Lógica de Negócio:** Implementar a interação com plataformas externas.
+        - [ ] **Criar Testes Automatizados:** Escrever testes para os novos endpoints.
+        - [ ] **Documentar API:** Adicionar documentação detalhada.
+    - **Gateways de Pagamento:** Integrar com APIs de pagamento (ex: Stripe, PagSeguro) para cobrança online de faturas e serviços.
+    - **Sistemas de Laboratórios:** Criar endpoints para recebimento automático de resultados de exames.
 - **Notificações em Tempo Real e Confirmação Automática de Agendamentos (D-2):** Implementar um sistema robusto de notificações para eventos importantes e lembretes de agendamento com confirmação/cancelamento.
     - **Sugestão de Implementação:**
         - **Backend:**
